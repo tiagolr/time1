@@ -17,11 +17,11 @@ TIME1::TIME1(const InstanceInfo& info)
 {
   // init params
   GetParam(kPattern)->InitInt("Pattern", 1, 1, 12);
-  GetParam(kSync)->InitEnum("Sync", 5, 18, "", 0, "", "Rate Hz", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");
+  GetParam(kSync)->InitEnum("Sync", 4, 17, "", 0, "", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");
   GetParam(kPaintMode)->InitEnum("Paint", 1, 5, "", 0, "", "Erase", "Line", "Saw up", "Saw Down", "Triangle");
-  GetParam(kPointMode)->InitEnum("Point", 1, 8, "", 0, "", "Hold", "Curve", "S-Curve", "Pulse", "Wave", "Triangle", "Stairs", "Smooth St");
+  GetParam(kPointMode)->InitEnum("Point", 0, 8, "", 0, "", "Hold", "Curve", "S-Curve", "Pulse", "Wave", "Triangle", "Stairs", "Smooth St");
   GetParam(kSnap)->InitBool("Snap", 0);
-  GetParam(kGrid)->InitInt("Grid", 8, 2, 32);
+  GetParam(kGrid)->InitInt("Grid", 16, 2, 32);
   GetParam(kRetrigger)->InitBool("Retrigger", 0);
 
   preSamples.resize(PLUG_MAX_WIDTH, 0);
@@ -31,9 +31,8 @@ TIME1::TIME1(const InstanceInfo& info)
   // init patterns
   for (int i = 0; i < 12; i++) {
     patterns[i] = new Pattern(*this, i);
-    patterns[i]->insertPoint(0, 1, 0, 1);
-    patterns[i]->insertPoint(0.5, 0, 0, 1);
-    patterns[i]->insertPoint(1, 1, 0, 1);
+    patterns[i]->insertPoint(0, 0, 0, 0);
+    patterns[i]->insertPoint(1, 0, 0, 0);
     patterns[i]->buildSegments();
   }
   pattern = patterns[0];
@@ -132,7 +131,7 @@ void TIME1::layoutControls(IGraphics* g)
 
   const IRECT b = g->GetBounds();
   g->GetBackgroundControl()->SetTargetAndDrawRECTs(b);
-  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(158));
+  view->SetTargetAndDrawRECTs(b.GetReducedFromTop(70));
 
   // first row left
   int drawx = 95;
@@ -145,9 +144,9 @@ void TIME1::layoutControls(IGraphics* g)
   drawx = b.R - 35;
   preferencesControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+25, drawy+25).GetPadded(-2.5).GetHShifted(2.5).GetVShifted(2.5));
 
-  // third row left
+  // second row left
   drawx = 10;
-  drawy += 90;
+  drawy += 35;
   paintLabel->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+40, drawy+20));
   drawx += 42;
   paintModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx+80, drawy+20));
@@ -160,7 +159,7 @@ void TIME1::layoutControls(IGraphics* g)
   drawx += 30;
   retriggerControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 20, drawy + 20));
 
-  // third row right
+  // second row right
   drawx = b.R - 70;
   midiModeControl->SetTargetAndDrawRECTs(IRECT(drawx, drawy, drawx + 60, drawy + 20));
   drawx -= 70;
@@ -229,24 +228,23 @@ void TIME1::OnParamChange(int paramIdx)
   else if (paramIdx == kSync) {
     dirtyControls = true;
     auto sync = GetParam(kSync)->Value();
-    if (sync == 0) syncQN = 0;
-    if (sync == 1) syncQN = 1./4.; // 1/16
-    if (sync == 2) syncQN = 1./2.; // 1/8
-    if (sync == 3) syncQN = 1/1; // 1/4
-    if (sync == 4) syncQN = 1*2; // 1/2
-    if (sync == 5) syncQN = 1*4; // 1bar
-    if (sync == 6) syncQN = 1*8; // 2bar
-    if (sync == 7) syncQN = 1*16; // 4bar
-    if (sync == 8) syncQN = 1./6.; // 1/16t
-    if (sync == 9) syncQN = 1./3.; // 1/8t
-    if (sync == 10) syncQN = 2./3.; // 1/4t
-    if (sync == 11) syncQN = 4./3.; // 1/2t
-    if (sync == 12) syncQN = 8./3.; // 1/1t
-    if (sync == 13) syncQN = 1./4.*1.5; // 1/16.
-    if (sync == 14) syncQN = 1./2.*1.5; // 1/8.
-    if (sync == 15) syncQN = 1./1.*1.5; // 1/4.
-    if (sync == 16) syncQN = 2./1.*1.5; // 1/2.
-    if (sync == 17) syncQN = 4./1.*1.5; // 1/1.
+    if (sync == 0) syncQN = 1./4.; // 1/16
+    if (sync == 1) syncQN = 1./2.; // 1/8
+    if (sync == 2) syncQN = 1/1; // 1/4
+    if (sync == 3) syncQN = 1*2; // 1/2
+    if (sync == 4) syncQN = 1*4; // 1bar
+    if (sync == 5) syncQN = 1*8; // 2bar
+    if (sync == 6) syncQN = 1*16; // 4bar
+    if (sync == 7) syncQN = 1./6.; // 1/16t
+    if (sync == 8) syncQN = 1./3.; // 1/8t
+    if (sync == 9) syncQN = 2./3.; // 1/4t
+    if (sync == 10) syncQN = 4./3.; // 1/2t
+    if (sync == 11) syncQN = 8./3.; // 1/1t
+    if (sync == 12) syncQN = 1./4.*1.5; // 1/16.
+    if (sync == 13) syncQN = 1./2.*1.5; // 1/8.
+    if (sync == 14) syncQN = 1./1.*1.5; // 1/4.
+    if (sync == 15) syncQN = 2./1.*1.5; // 1/2.
+    if (sync == 16) syncQN = 4./1.*1.5; // 1/1.
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
@@ -421,6 +419,7 @@ bool TIME1::SerializeState(IByteChunk &chunk) const
   chunk.Put(&drawWave);
   chunk.Put(&alwaysPlaying);
   chunk.Put(&midiMode);
+  chunk.Put(&anoise);
 
   // reserved space
   int cSize = chunk.Size();
@@ -451,6 +450,7 @@ int TIME1::UnserializeState(const IByteChunk &chunk, int startPos)
   startPos = chunk.Get(&drawWave, startPos);
   startPos = chunk.Get(&alwaysPlaying, startPos);
   startPos = chunk.Get(&midiMode, startPos);
+  startPos = chunk.Get(&anoise, startPos);
 
   // reserved space
   char buffer[1];

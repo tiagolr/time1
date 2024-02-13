@@ -98,8 +98,8 @@ void Pattern::reverse()
 void Pattern::clear()
 {
     points.clear();
-    insertPoint(0, 0.5, 0, 1);
-    insertPoint(1, 0.5, 0, 1);
+    insertPoint(0, 0, 0, 0);
+    insertPoint(1, 0, 0, 1);
 }
 
 void Pattern::buildSegments()
@@ -109,8 +109,8 @@ void Pattern::buildSegments()
     for (size_t i = 0; i < points.size() - 1; ++i) {
         auto p1 = points[i];
         auto p2 = points[i + 1];
-        //auto pwr = std::pow(1.1, std::fabs(p1.tension * 50));
-        segments.push_back({p1.x, p2.x, p1.y, p2.y, p1.tension, 0, p1.type});
+        auto pwr = std::pow(1.1, std::fabs(p1.tension * 50));
+        segments.push_back({p1.x, p2.x, p1.y, p2.y, p1.tension, pwr, p1.type});
     }
 }
 
@@ -160,11 +160,8 @@ void Pattern::paste()
 double Pattern::get_y_curve(Segment seg, double x)
 {
     auto rise = seg.y1 > seg.y2;
-    auto tmult = gate.tensionMult;
-    auto ten = seg.tension + (rise ? -tmult / 100 : tmult / 100);
-    if (ten > 1) ten = 1;
-    if (ten < -1) ten = -1;
-    auto pwr = pow(1.1, std::fabs(ten * 50));
+    auto ten = seg.tension;
+    auto pwr = seg.power;
 
     if (seg.x1 == seg.x2)
         return seg.y2;
@@ -179,11 +176,8 @@ double Pattern::get_y_curve(Segment seg, double x)
 double Pattern::get_y_scurve(Segment seg, double x)
 {
   auto rise = seg.y1 > seg.y2;
-  auto tmult = gate.tensionMult;
-  auto ten = seg.tension + (rise ? -tmult / 100 : tmult / 100);
-  if (ten > 1) ten = 1;
-  if (ten < -1) ten = -1;
-  auto pwr = pow(1.1, std::fabs(ten * 50));
+  auto ten = seg.tension;
+  auto pwr = seg.power;
 
   double xx = (seg.x2 + seg.x1) / 2;
   double yy = (seg.y2 + seg.y1) / 2;

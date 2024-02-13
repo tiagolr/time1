@@ -57,14 +57,18 @@ void View::drawGrid(IGraphics& g)
   double gridx = double(winw) / grid;
   double gridy = double(winh) / grid;
 
-  auto colorNormal = COLOR_WHITE.WithOpacity(0.15f);
-  auto colorBold = COLOR_WHITE.WithOpacity(0.30f);
+  auto colorNormal = COLOR_WHITE.WithOpacity(0.075f);
+  auto colorBold = COLOR_WHITE.WithOpacity(0.15f);
+  auto colorCross = COLOR_WHITE.WithOpacity(0.05f);
 
-  for (int i = 0; i < grid + 1; ++i)
-  {
+  g.FillTriangle(COLOR_BLACK.WithOpacity(0.5), winx, winy, winx, winy + winh, winx + winw, winy + winh);
+  
+  for (int i = 0; i < grid + 1; ++i) {
     auto color = grid % 4 == 0 && i && i % 4 == 0 && i < grid ? colorBold : colorNormal;
     g.DrawLine(color, winx, winy + gridy * i, winx + winw, winy + gridy * i);
     g.DrawLine(color, winx + gridx * i, winy, winx + gridx * i, winy + winh);
+    g.DrawLine(colorCross, winx + gridx * i, winy, winx + winw, winy + winh - gridy * i);
+    g.DrawLine(colorCross, winx, winy + gridy * i, winx + winw - gridx * i, winy + winh);
   }
 }
 

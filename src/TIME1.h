@@ -48,6 +48,7 @@ public:
   bool drawWave = true;
   bool alwaysPlaying = false;
   bool midiMode = false;
+  int anoise = 1; // anti-noise/clicks 0 = no anti-noise, 1 = low, 2 - strong
   // state
   bool dirtyControls = false; // used to re-layout components during Idle(), avoids crashes when laying out components directly
   int winw = PLUG_WIDTH; // quick fix for referencing view width during process block, set by view::onResize
@@ -56,7 +57,6 @@ public:
   bool snap = false;
   bool midiTrigger = false; // trigger envelope via midi notes
   int gridSegs = 8;
-  double tensionMult = 0;
   double syncQN = 0;
   double xpos = 0;
   double ypos = 0;
