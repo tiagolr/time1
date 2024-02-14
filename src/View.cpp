@@ -84,7 +84,7 @@ void View::drawSegments(IGraphics& g)
   {
     double px = double(i) / double(winw);
     double py = gate.pattern->get_y_at(px) * winh + winy;
-    g.DrawLine(colorLight, i + winx, winy + winh, i + winx, py);
+    g.DrawLine(colorLight, i + winx, winy, i + winx, py);
     g.DrawLine(colorBold, lastX, lastY, i + winx, py, 0, 2);
     lastX = i + winx;
     lastY = py;
