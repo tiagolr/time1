@@ -4,6 +4,7 @@
 #include "Test/TestSizeControl.h"
 #include "View.h"
 #include "Widgets.h"
+#include "Delay.h"
 
 const IColor TIME1::COLOR_BG = IColor::FromColorCode(0x181614);
 const IColor TIME1::COLOR_ACTIVE = IColor::FromColorCode(0x00FF80);
@@ -15,6 +16,8 @@ TIME1::TIME1(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets)),
   settingsSVG(nullptr)
 {
+
+  delayL.resize(1000);
   // init params
   GetParam(kPattern)->InitInt("Pattern", 1, 1, 12);
   GetParam(kSync)->InitEnum("Sync", 4, 17, "", 0, "", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");

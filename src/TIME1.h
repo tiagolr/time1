@@ -1,10 +1,9 @@
 #pragma once
 
 #include "IPlug_include_in_plug_hdr.h"
-#include "Oscillator.h"
-#include "ISender.h"
 #include "IControls.h"
 #include "Pattern.h"
+#include "Delay.h"
 
 const int kNumPresets = 1;
 
@@ -88,6 +87,9 @@ public:
   About* aboutControl;
   ITextControl* paintLabel;
   ITextControl* pointLabel;
+
+  Delay delayL;
+  Delay delayR;
 
   IVStyle patternSwitchStyle;
   IVStyle buttonStyle;
