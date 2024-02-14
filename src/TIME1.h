@@ -43,7 +43,7 @@ class TIME1 final : public Plugin
 public:
   // prefs
   bool linkEdgePoints = false;
-  int triggerChannel = 10;
+  int triggerChannel = 11;
   bool drawWave = true;
   bool alwaysPlaying = false;
   bool midiMode = false;

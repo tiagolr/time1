@@ -15,12 +15,6 @@ void Delay::write(sample s)
   curpos += 1;
   if (curpos == size)
     curpos = 0;
-  //this.buf[this.curpos] = signal;
-  //this.buf[this.size] = this.buf[0];
-  //this.buf[this.size+1] = this.buf[1];
-  //this.buf[-1] = this.buf[this.size-1];
-  //this.curpos += 1;
-  //this.curpos == this.size ? this.curpos = 0;
 }
 
 sample Delay::read(double delay)
@@ -62,15 +56,6 @@ sample Delay::read3(double delay)
     a1 = a3 * 3.0; a2 -= a1; a0 -= a3; a1 -= f;
     a0 *= f; a1 *= f; a2 *= f; a3 *= f; a1 += 1.0;
     curval = a0 * x0 + a1 * x1 + a2 * x2 + a3 * x3;
-    //i_ = floor(pos_);
-    //f_ = pos_ - i_;
-    //x0_ = this.buf[i_-1]; x1_ = this.buf[i_];
-    //x2_ = this.buf[i_+1]; x3_ = this.buf[i_+2];
-    //a3_ = f_ * f_; a3_ -= 1.0; a3_ *= (1.0 / 6.0);
-    //a2_ = (f_ + 1.0) * 0.5; a0_ = a2_ - 1.0;
-    //a1_ = a3_ * 3.0; a2_ -= a1_; a0_ -= a3_; a1_ -= f_;
-    //a0_ *= f_; a1_ *= f_; a2_ *= f_; a3_ *= f_; a1_ += 1.0;
-    //this.curval = a0_*x0_ + a1_*x1_ + a2_*x2_ + a3_*x3_;
   }
   return curval;
 }
