@@ -306,6 +306,9 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   const double beatsPerSpl = tempo / (60. * srate);
   isPlaying = GetTransportIsRunning();
   const double sync = GetParam(kSync)->Value();
+  double ansamps = 0; // anti-noise samples
+  if (anoise == 1) ansamps = std::floor(0.0015 * srate); // low anti-noise
+  if (anoise == 2) ansamps = std::floor(0.01 * srate); // high anti-noise
   // update beatpos only during playback
   if (!midiMode && isPlaying) {
     beatPos = GetPPQPos();
@@ -337,12 +340,35 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
     delayL.write(inputs[0][s]);
     delayR.write(inputs[1][s]);
+    sample outL, outR;
 
-    sample outL = delayL.read(1 + ypos * delayL.size);
-    sample outR = delayR.read(1 + ypos * delayR.size);
+    if (lypos == ypos) {
+      outL = delayL.read(1 + ypos * delayL.size);
+      outR = delayR.read(1 + ypos * delayR.size);
+    }
+    else {
+      // interpolate delay only when ypos is changing
+      outL = delayL.read3(1 + ypos * delayL.size);
+      outR = delayR.read3(1 + ypos * delayR.size);
+    }
+
+    // when y value jumps activate cross fade / anti-click
+    if (std::fabs(ypos - lypos) > 0.001) {
+      xfade = ansamps;
+      xfadepos = 1 + lypos * delayL.size;
+    }
+
+    // anti-noise cross fade
+    // fades in new signal fades out old signal
+    if (xfade > 0) {
+      outL = outL * (ansamps - xfade) / ansamps + delayL.read3(xfadepos + ansamps - xfade) * xfade / ansamps;
+      outR = outR * (ansamps - xfade) / ansamps + delayR.read3(xfadepos + ansamps - xfade) * xfade / ansamps;
+      xfade -= 1;
+    }
 
     outputs[0][s] = outL;
     outputs[1][s] = outR;
+    lypos = ypos;
   };
 
   if (!midiMode && (isPlaying || alwaysPlaying)) {

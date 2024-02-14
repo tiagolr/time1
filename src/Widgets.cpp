@@ -79,7 +79,11 @@ void Preferences::showPopupMenu()
   IPopupMenu* optionsMenu = new IPopupMenu();
   IPopupMenu* triggerMenu = new IPopupMenu();
   IPopupMenu* loadMenu = new IPopupMenu();
+  IPopupMenu* anoiseMenu = new IPopupMenu();
 
+  anoiseMenu->AddItem("None")->SetChecked(gate.anoise == 0);
+  anoiseMenu->AddItem("Low")->SetChecked(gate.anoise == 1);
+  anoiseMenu->AddItem("High")->SetChecked(gate.anoise == 2);
 
   triggerMenu->AddItem("Off")->SetChecked(gate.triggerChannel == 0);
   for (int i = 0; i < 16; ++i) {
@@ -88,6 +92,7 @@ void Preferences::showPopupMenu()
   triggerMenu->AddItem("Omni")->SetChecked(gate.triggerChannel == 17);
 
   optionsMenu->AddItem("Trigger channel")->SetSubmenu(triggerMenu);
+  optionsMenu->AddItem("Click reduction")->SetSubmenu(anoiseMenu);
   optionsMenu->AddItem("Link edge points")->SetChecked(gate.linkEdgePoints);
 
   loadMenu->AddItem("Sine");
@@ -165,6 +170,15 @@ void Preferences::OnPopupMenuSelection(IPopupMenu* pSelectedMenu, int valIdx) {
   }
   else if (strcmp(text, "About") == 0) {
     gate.aboutControl->Hide(false);
+  }
+  else if (strcmp(text, "None") == 0) {
+    gate.anoise = 0;
+  }
+  else if (strcmp(text, "Low") == 0) {
+    gate.anoise = 1;
+  }
+  else if (strcmp(text, "High") == 0) {
+    gate.anoise = 2;
   }
 }
 

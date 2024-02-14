@@ -59,6 +59,9 @@ public:
   double syncQN = 0;
   double xpos = 0;
   double ypos = 0;
+  double lypos = 0; // last y pos
+  double xfade = 0;
+  double xfadepos = 0;
   double beatPos = 0;
   int winpos = 0;
   int lwinpos = 0;
