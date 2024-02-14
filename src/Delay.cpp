@@ -26,10 +26,14 @@ void Delay::write(sample s)
 sample Delay::read(double delay)
 {
   if (delay >= 0 && delay < size) {
-    double pos = curpos - delay;
-    if (pos < 0)
-      pos += buf.size();
-    curval = buf[std::floor(delay)];
+    double pos = (double)curpos - delay;
+    if (pos < 0) {
+      pos += (double)size;
+      if (pos == size) { // avoids error with floating point arithmetics
+        pos = 0;
+      }
+    }
+    curval = buf[std::floor(pos)];
   }
   return curval;
 }
@@ -39,9 +43,13 @@ sample Delay::read(double delay)
 sample Delay::read3(double delay)
 {
   if (delay >= 0 && delay < size) {
-    double pos = curpos - delay;
-    if (pos < 0)
-      pos += size;
+    double pos = (double)curpos - delay;
+    if (pos < 0) {
+      pos += (double)size;
+      if (pos == size) { // avoids error with floating point arithmetics
+        pos = 0;
+      }
+    }
     double i = std::floor(pos);
     double f = pos - i;
     sample x0, x1, x2, x3, a0, a1, a2, a3;

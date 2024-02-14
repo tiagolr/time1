@@ -159,7 +159,7 @@ void View::drawMidPoints(IGraphics& g)
 void View::drawSeek(IGraphics& g)
 {
   g.DrawLine(TIME1::COLOR_SEEK.WithOpacity(0.5), gate.xpos * winw + winx, winy, gate.xpos * winw + winx, winy + winh);
-  g.DrawCircle(TIME1::COLOR_SEEK, gate.xpos * winw + winx, (1 - gate.ypos) * winh + winy, 5);
+  g.DrawCircle(TIME1::COLOR_SEEK, gate.xpos * winw + winx, gate.ypos * winh + winy, 5);
 }
 
 int View::getHoveredPoint(int x, int y)

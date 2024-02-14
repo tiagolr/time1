@@ -16,12 +16,14 @@ TIME1::TIME1(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets)),
   settingsSVG(nullptr)
 {
+  // init delays just in case
+  delayL.resize(44100);
+  delayR.resize(44100);
 
-  delayL.resize(1000);
   // init params
   GetParam(kPattern)->InitInt("Pattern", 1, 1, 12);
   GetParam(kSync)->InitEnum("Sync", 4, 17, "", 0, "", "1/16", "1/8", "1/4", "1/2", "1/1", "2/1", "4/1", "1/16t", "1/8t", "1/4t", "1/2t", "1/1t", "1/16.", "1/8.", "1/4.", "1/2.", "1/1.");
-  GetParam(kPaintMode)->InitEnum("Paint", 1, 5, "", 0, "", "Erase", "Line", "Saw up", "Saw Down", "Triangle");
+  GetParam(kPaintMode)->InitEnum("Paint", 0, 5, "", 0, "", "Erase", "Line", "Saw up", "Saw Down", "Triangle");
   GetParam(kPointMode)->InitEnum("Point", 0, 8, "", 0, "", "Hold", "Curve", "S-Curve", "Pulse", "Wave", "Triangle", "Stairs", "Smooth St");
   GetParam(kSnap)->InitBool("Snap", 0);
   GetParam(kGrid)->InitInt("Grid", 16, 2, 32);
@@ -70,7 +72,7 @@ void TIME1::makeControls(IGraphics* g)
   g->AttachPanelBackground(COLOR_BG);
   g->AttachControl(view);
   auto t = IText(26, COLOR_WHITE, "Roboto-Bold", EAlign::Near);
-  g->AttachControl(new ITextControl(IRECT(10,14,100,35), "GATE-1", t, true));
+  g->AttachControl(new ITextControl(IRECT(10,14,100,35), "TIME-1", t, true));
   patternSwitches = new PatternSwitches(IRECT(), kPattern, {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}, "", patternSwitchStyle, EVShape::EndsRounded, EDirection::Horizontal);
   patternSwitches->SetTooltip("Pattern select");
   g->AttachControl(patternSwitches);
@@ -248,6 +250,8 @@ void TIME1::OnParamChange(int paramIdx)
     if (sync == 14) syncQN = 1./1.*1.5; // 1/4.
     if (sync == 15) syncQN = 2./1.*1.5; // 1/2.
     if (sync == 16) syncQN = 4./1.*1.5; // 1/1.
+
+    resizeDelays();
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
@@ -258,6 +262,13 @@ void TIME1::OnParamChange(int paramIdx)
   else if (paramIdx == kRetrigger && GetParam(kRetrigger)->Value() == 1 && canRetrigger()) {
     retriggerEnvelope();
   }
+}
+
+void TIME1::resizeDelays()
+{
+  const int size = syncQN * GetSampleRate() * 60 / GetTempo();
+  delayL.resize(size);
+  delayR.resize(size);
 }
 
 void TIME1::OnParentWindowResize(int width, int height)
@@ -279,18 +290,12 @@ void TIME1::OnHostSelectedViewConfiguration(int width, int height)
 
 bool TIME1::canRetrigger()
 {
-  bool isSync = GetParam(kSync)->Value() > 0;
-  return !midiMode && (!isSync && (alwaysPlaying || isPlaying)) || (alwaysPlaying && !isPlaying);
+  return !midiMode && alwaysPlaying && !isPlaying;
 }
 
 void TIME1::retriggerEnvelope()
 {
   beatPos = 0;
-}
-
-double inline TIME1::getY(double x)
-{
-  return 1 - pattern->get_y_at(x);
 }
 
 void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
@@ -327,18 +332,26 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       postSamples[winpos] = avgPostSample;
   };
 
+  auto processXPos = [&](double xpos, int s) {
+    ypos = pattern->get_y_at(xpos);
+
+    delayL.write(inputs[0][s]);
+    delayR.write(inputs[1][s]);
+
+    sample outL = delayL.read(1 + ypos * delayL.size);
+    sample outR = delayR.read(1 + ypos * delayR.size);
+
+    outputs[0][s] = outL;
+    outputs[1][s] = outR;
+  };
+
   if (!midiMode && (isPlaying || alwaysPlaying)) {
     for (int s = 0; s < nFrames; ++s) {
       beatPos += beatsPerSpl;
       xpos = beatPos / syncQN;
       xpos -= std::floor(xpos);
 
-      ypos = getY(xpos);
-
-      for (int c = 0; c < nChans; ++c) {
-        outputs[c][s] = inputs[c][s] * ypos;
-      }
-
+      processXPos(xpos, s);
       processDisplaySamples(s);
     }
   }
@@ -357,10 +370,7 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       else {
         xpos -= std::floor(xpos);
       }
-      ypos = getY(xpos);
-      for (int c = 0; c < nChans; ++c) {
-        outputs[c][s] = inputs[c][s] * ypos;
-      }
+      processXPos(xpos, s);
       processDisplaySamples(s);
     }
   }
@@ -368,10 +378,10 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   // keep processing the same position if stopped in MIDI mode
   else if (midiMode && !alwaysPlaying && !midiTrigger) {
     for (int s = 0; s < nFrames; ++s) {
-      ypos = getY(xpos);
-      for (int c = 0; c < nChans; ++c) {
-        outputs[c][s] = inputs[c][s] * ypos;
-      }
+      // ypos = getY(xpos);
+      // for (int c = 0; c < nChans; ++c) {
+      //   outputs[c][s] = inputs[c][s] * ypos;
+      // }
     }
   }
 }
