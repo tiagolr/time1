@@ -407,7 +407,7 @@ bool View::isSnapping(const IMouseMod& mod) {
 
 bool View::isCollinear(Segment seg)
 {
-  return std::fabs(seg.x1 - seg.x2) < 0.01 || std::fabs(seg.y1 - seg.y2) < 0.01;
+  return std::fabs(seg.x1 - seg.x2) < 0.01 || std::fabs(seg.y1 - seg.y2) < 0.01 || seg.type == 0;
 };
 
 bool View::pointInRect(int x, int y, int xx, int yy, int w, int h)
