@@ -400,6 +400,14 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
       processDisplaySamples(s);
     }
   }
+
+  // keep processing the same position if stopped in MIDI mode
+  else if (midiMode && !alwaysPlaying && !midiTrigger) {
+    for (int s = 0; s < nFrames; ++s) {
+      outputs[0][s] = inputs[0][s];
+      outputs[1][s] = inputs[1][s];
+    }
+  }
 }
 
 void TIME1::ProcessMidiMsg(const IMidiMsg& msg)
