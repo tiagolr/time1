@@ -189,7 +189,7 @@ void About::OnAttached()
   url = new IURLControl(IRECT(), "Github", PLUG_URL_STR, IText(16, COLOR_WHITE, "Roboto-Bold"));
   auto text = std::string("");
   text += PLUG_COPYRIGHT_STR;
-  text += "\n\nToggle patterns 1-12 by sending midi notes on chn 10 (default)\n";
+  text += "\n\nToggle patterns 1-12 by sending midi notes on chn 11 (default)\n";
   text += "Left click - move points or set tension\n";
   text += "Right click - paint mode\n";
   text += "Double click - remove or add points\n";
