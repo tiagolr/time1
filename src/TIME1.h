@@ -109,6 +109,7 @@ public:
   void makeStyles();
   void makeControls(IGraphics* g);
 
+  void onSyncChange();
   void resizeDelays();
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
   void ProcessMidiMsg(const IMidiMsg& msg) override;

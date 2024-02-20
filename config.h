@@ -1,7 +1,7 @@
 #define PLUG_NAME "TIME1"
 #define PLUG_MFR "tilr"
-#define PLUG_VERSION_HEX 0x00010000
-#define PLUG_VERSION_STR "1.0.0"
+#define PLUG_VERSION_HEX 0x00010001
+#define PLUG_VERSION_STR "1.0.1"
 #define PLUG_UNIQUE_ID 'tm1'
 #define PLUG_MFR_ID 'tilr'
 #define PLUG_URL_STR "https://github.com/tiagolr/time1"
@@ -29,8 +29,8 @@
 #define PLUG_FPS 60
 #define PLUG_SHARED_RESOURCES 0
 #define PLUG_HOST_RESIZE 1
-#define PLUG_MIN_WIDTH 256
-#define PLUG_MIN_HEIGHT 256
+#define PLUG_MIN_WIDTH 540
+#define PLUG_MIN_HEIGHT 460
 #define PLUG_MAX_WIDTH 8192
 #define PLUG_MAX_HEIGHT 8192
 

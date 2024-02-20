@@ -64,6 +64,8 @@ TIME1::TIME1(const InstanceInfo& info)
     inited = true;
     layoutControls(g);
   };
+
+  onSyncChange(); // FIX - attempt to force set syncQN on Bitwig
 }
 
 void TIME1::makeControls(IGraphics* g)
@@ -231,27 +233,7 @@ void TIME1::OnParamChange(int paramIdx)
     pattern = patterns[(int)GetParam(kPattern)->Value() - 1];
   }
   else if (paramIdx == kSync) {
-    dirtyControls = true;
-    auto sync = GetParam(kSync)->Value();
-    if (sync == 0) syncQN = 1./4.; // 1/16
-    if (sync == 1) syncQN = 1./2.; // 1/8
-    if (sync == 2) syncQN = 1/1; // 1/4
-    if (sync == 3) syncQN = 1*2; // 1/2
-    if (sync == 4) syncQN = 1*4; // 1bar
-    if (sync == 5) syncQN = 1*8; // 2bar
-    if (sync == 6) syncQN = 1*16; // 4bar
-    if (sync == 7) syncQN = 1./6.; // 1/16t
-    if (sync == 8) syncQN = 1./3.; // 1/8t
-    if (sync == 9) syncQN = 2./3.; // 1/4t
-    if (sync == 10) syncQN = 4./3.; // 1/2t
-    if (sync == 11) syncQN = 8./3.; // 1/1t
-    if (sync == 12) syncQN = 1./4.*1.5; // 1/16.
-    if (sync == 13) syncQN = 1./2.*1.5; // 1/8.
-    if (sync == 14) syncQN = 1./1.*1.5; // 1/4.
-    if (sync == 15) syncQN = 2./1.*1.5; // 1/2.
-    if (sync == 16) syncQN = 4./1.*1.5; // 1/1.
-
-    resizeDelays();
+    onSyncChange();
   }
   else if (paramIdx == kGrid) {
     gridSegs = (int)GetParam(kGrid)->Value();
@@ -262,6 +244,31 @@ void TIME1::OnParamChange(int paramIdx)
   else if (paramIdx == kRetrigger && GetParam(kRetrigger)->Value() == 1 && canRetrigger()) {
     retriggerEnvelope();
   }
+}
+
+void TIME1::onSyncChange()
+{
+  dirtyControls = true;
+  auto sync = GetParam(kSync)->Value();
+  if (sync == 0) syncQN = 1./4.; // 1/16
+  if (sync == 1) syncQN = 1./2.; // 1/8
+  if (sync == 2) syncQN = 1/1; // 1/4
+  if (sync == 3) syncQN = 1*2; // 1/2
+  if (sync == 4) syncQN = 1*4; // 1bar
+  if (sync == 5) syncQN = 1*8; // 2bar
+  if (sync == 6) syncQN = 1*16; // 4bar
+  if (sync == 7) syncQN = 1./6.; // 1/16t
+  if (sync == 8) syncQN = 1./3.; // 1/8t
+  if (sync == 9) syncQN = 2./3.; // 1/4t
+  if (sync == 10) syncQN = 4./3.; // 1/2t
+  if (sync == 11) syncQN = 8./3.; // 1/1t
+  if (sync == 12) syncQN = 1./4.*1.5; // 1/16.
+  if (sync == 13) syncQN = 1./2.*1.5; // 1/8.
+  if (sync == 14) syncQN = 1./1.*1.5; // 1/4.
+  if (sync == 15) syncQN = 2./1.*1.5; // 1/2.
+  if (sync == 16) syncQN = 4./1.*1.5; // 1/1.
+
+  resizeDelays();
 }
 
 void TIME1::resizeDelays()
@@ -403,6 +410,13 @@ void TIME1::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 
   // keep processing the same position if stopped in MIDI mode
   else if (midiMode && !alwaysPlaying && !midiTrigger) {
+    for (int s = 0; s < nFrames; ++s) {
+      outputs[0][s] = inputs[0][s];
+      outputs[1][s] = inputs[1][s];
+    }
+  }
+
+  else { // FIX FL studio glitches on stop play
     for (int s = 0; s < nFrames; ++s) {
       outputs[0][s] = inputs[0][s];
       outputs[1][s] = inputs[1][s];
