@@ -1,7 +1,7 @@
 #define PLUG_NAME "TIME1"
 #define PLUG_MFR "tilr"
-#define PLUG_VERSION_HEX 0x00010001
-#define PLUG_VERSION_STR "1.0.1"
+#define PLUG_VERSION_HEX 0x00010002
+#define PLUG_VERSION_STR "1.0.2"
 #define PLUG_UNIQUE_ID 'tm1'
 #define PLUG_MFR_ID 'tilr'
 #define PLUG_URL_STR "https://github.com/tiagolr/time1"
