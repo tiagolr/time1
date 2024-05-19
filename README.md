@@ -5,6 +5,7 @@ Can be used for stutter effects, tape stop, glitch, scratch, reverse, pitch shif
 It is a port of [TIME-1 JSFX](https://github.com/tiagolr/tilr_jsfx?tab=readme-ov-file#time-1) to C++ using [Iplug2](https://iplug2.github.io/)
 
 * [Download VST3](https://github.com/tiagolr/time1/raw/master/dist/TIME1.vst3)
+* [Download CLAP](https://github.com/tiagolr/time1/raw/master/dist/TIME1.clap)
 
 ![](doc/time1.png)
 
