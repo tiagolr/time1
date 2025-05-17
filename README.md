@@ -1,3 +1,7 @@
+# Project Archived
+
+This project is archived, development has shifted to [TIME-12](https://github.com/tiagolr/time12), a newer version of this plugin rebuilt from the ground up using the JUCE framework. It includes new features and many improvements and fixes.
+
 # TIME1
 
 TIME1 is an open source delay modulator similar to plugins like GrossBeat or TimeShaper.
